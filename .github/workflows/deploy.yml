@@ -35,3 +35,17 @@ jobs:
       - name: Push image to ECR
         run: |
           docker push 747289880619.dkr.ecr.us-east-1.amazonaws.com/myapp:v1
+      
+      - name: Setup kubeconfig
+        run: |
+          echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig
+          export KUBECONFIG=./kubeconfig
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl set image deployment/myapp \
+          myapp=747289880619.dkr.ecr.us-east-1.amazonaws.com/myapp:v1
+
+      - name: Verify rollout
+        run: |
+          kubectl rollout status deployment/myapp    
